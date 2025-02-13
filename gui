@@ -1,0 +1,152 @@
+local flinger = game.Players.LocalPlayer
+local goofy = flinger.Character or flinger.CharacterAdded:Wait()
+
+local flinging = false
+
+local awesomegui = Instance.new('ScreenGui')
+awesomegui.Parent = flinger.PlayerGui
+awesomegui.ResetOnSpawn = false
+awesomegui.Name = "j_god_v0" -- funneh
+
+local frame = Instance.new('Frame')
+frame.Parent = awesomegui
+frame.Size = UDim2.new(.6, 0, .6, 0)
+frame.Position = UDim2.new(0.2, 0,0.2, 0)
+
+local scrollingframe = Instance.new("ScrollingFrame")
+scrollingframe.Parent = frame
+scrollingframe.Size = UDim2.new(.9,0,1,0)
+scrollingframe.Position = UDim2.new(.1,0,0,0)
+
+local layout = Instance.new('UIListLayout')
+layout.Parent = scrollingframe
+layout.Padding = UDim.new(.05,0)
+layout.Wraps = true
+
+local victim = nil
+local victimbox = Instance.new('TextBox')
+victimbox.Parent = frame
+victimbox.Size = UDim2.new(.1,0,.2,0)
+victimbox.TextScaled = true
+victimbox.Text = ""
+victimbox.PlaceholderText = "victim"
+victimbox.PlaceholderColor3 = Color3.new(0, 0, 0)
+victimbox.Font = Enum.Font.MontserratBold
+victimbox.Changed:Connect(function(prop)
+	if prop == "Text" then
+		victim = victimbox.Text
+		print(victim)
+	end
+end)
+
+function doButton(button, text)
+	button.Size = UDim2.new(.25,0,.2,0)
+	button.Parent = scrollingframe
+	button.TextScaled = true
+	button.Text = text
+	button.Font = Enum.Font.MontserratBold
+end
+
+local b1 = Instance.new('TextButton')
+doButton(b1, "tp tool")
+b1.Activated:Connect(function()
+	local tp = Instance.new("Tool")
+	tp.Parent = flinger.Backpack
+	tp.RequiresHandle = false
+	tp.Name = "tp"
+	tp.Activated:Connect(function()
+		tp.Parent:SetPrimaryPartCFrame(flinger:GetMouse().Hit)
+	end)
+end)
+
+local x = Instance.new('TextButton')
+x.Parent = awesomegui
+x.Size = UDim2.new(.05, 0, .1, 0)
+x.Position = UDim2.new(.9,0,0,0)
+x.TextScaled = true
+x.Text = "gui"
+x.Font = Enum.Font.MontserratBold
+x.Activated:Connect(function()
+	if frame.Visible == true then
+		frame.Visible = false
+	else
+		frame.Visible = true
+	end
+end)
+
+local b2 = Instance.new('TextButton')
+doButton(b2, "equip all tools")
+b2.Activated:Connect(function()
+	for _, tool in ipairs(flinger.Backpack:GetChildren()) do
+		tool.Parent = goofy
+	end
+end)
+
+local b3 = Instance.new('TextButton')
+doButton(b3, "activate tools")
+b3.Activated:Connect(function()
+	for _, tool in ipairs(goofy:GetChildren()) do
+		if tool:IsA("Tool") then
+			tool:Activate()
+		end
+	end
+end)
+
+local b4 = Instance.new('TextButton')
+doButton(b4, "get ids")
+b4.Activated:Connect(function()
+	print("---")
+	for _, player in ipairs(game.Players:GetPlayers()) do
+		print(player.UserId, player.Name)
+	end
+	print("---")
+end)
+
+local b5 = Instance.new('TextButton')
+doButton(b5, "no fog")
+b5.Activated:Connect(function()
+	for _, fog in ipairs(game.Lighting:GetChildren()) do
+		if fog:IsA("DepthOfFieldEffect") or fog:IsA("Atmosphere") or fog:IsA("BlurEffect") then
+			fog:Destroy()
+		end
+	end
+end)
+
+local b6 = Instance.new('TextButton')
+doButton(b6, "highlight players")
+b6.Activated:Connect(function()
+	for _, player in ipairs(game.Players:GetPlayers()) do
+		if player ~= flinger then
+			local box = Instance.new("Highlight")
+			box.Parent = player.Character
+			box.Adornee = player.Character
+			box.OutlineColor = Color3.new(1,0,0)
+			box.FillTransparency = .75
+		end
+	end
+end)
+
+local b7 = Instance.new('TextButton')
+doButton(b7, "fling")
+b7.Activated:Connect(function()
+	local fling = Instance.new("Tool")
+	fling.Parent = flinger.Backpack
+	fling.RequiresHandle = false
+	fling.Name = "fling"
+	fling.Equipped:Connect(function()
+		flinging = true
+		while flinging == true do
+			goofy:SetPrimaryPartCFrame(goofy.PrimaryPart.CFrame * CFrame.fromEulerAnglesXYZ(0,math.rad(50),0))
+			task.wait()
+		end
+	end)
+	fling.Unequipped:Connect(function()
+		flinging = false
+	end)
+end)
+
+local b8 = Instance.new('TextButton')
+doButton(b8, "to random")
+b8.Activated:Connect(function()
+	goofy:SetPrimaryPartCFrame(game.Players:GetPlayers()[math.random(1,#game.Players:GetPlayers())])
+end)
